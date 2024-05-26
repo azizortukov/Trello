@@ -1,10 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Main page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .overflow-auto {
+            white-space: nowrap;
+        }
+        .overflow-auto .col-3, .overflow-auto .col-2 {
+            display: inline-block;
+            float: none; /* Override Bootstrap's default column float */
+        }
+    </style>
+
 </head>
 <body>
-<h1>Main page</h1>
+<div class="col-10 offset-1 justify-content-center ">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+        <a class="navbar-brand" href="#">Trello Board</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-end " id="navbarNav">
+            <ul class="navbar-nav ">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Members' Statistics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Column Statistics</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center my-4">Trello-like Board</h1>
+    </div>
+</div>
+<div class="col-10 offset-1">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex overflow-auto">
+                <div class="col-3 mx-4 pb-4" th:each="i : ${#numbers.sequence(0, columns.size() - 1)}">
+                    <div class="card shadow rounded">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <form action="/column/move/previous" method="get">
+                                <div th:unless="${i == 0}">
+                                    <button class="btn btn-outline-dark" name="columnId" th:value="${columns.get(i).id}"><</button>
+                                </div>
+                            </form>
+                            <p class="mb-0 flex-grow-1 text-center" th:text="${columns.get(i).name}"></p>
+                            <form action="/column/move/next" method="get">
+                                <div th:unless="${i == columns.size() -1}">
+                                    <button class="btn btn-outline-dark" name="columnId" th:value="${columns.get(i).id}">></button>
+                                </div>
+                            </form>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center" th:each="task : ${columns.get(i).tasks}">
+                                <form action="/task/move" method="post">
+                                <button class="btn" name="task" th:unless="${i == 0}" th:value="${task.id} + '/' + ${columns.get(i - 1).id}"> <i class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
+                                </form>
+                                <p class="mb-0 flex-grow-1 text-center" th:text="${task.name}"></p>
+                                <form action="/task/move" method="post">
+                                <button class="btn" name="task" th:unless="${i == columns.size() - 1}" th:value="${task.id} + '/' + ${columns.get(i + 1).id}"><i class="fa-solid fa-chevron-right" style="font-size: 12px;"></i></button>
+                                </form>
+                            </li>
+                            <li class="list-group-item text-center">
+                                <form action="/task/add" method="post">
+                                    <div class="form-group">
+                                        <input type="hidden" name="columnId" th:value="${columns.get(i).id}">
+                                        <input type="text" class="form-control" name="taskName" placeholder="Task name">
+                                    </div>
+                                    <button class="btn btn-success">Add</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-2 text-center">
+                    <form action="/column/add" method="post">
+                        <div class="form-group ms-5">
+                            <input type="text" class="form-control" name="columnName" placeholder="List name">
+                        </div>
+                        <button class="btn btn-success">Add New List</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
