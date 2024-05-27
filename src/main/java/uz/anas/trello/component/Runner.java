@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import uz.anas.trello.entity.User;
 import uz.anas.trello.service.UserServiceImpl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Component
 @RequiredArgsConstructor
 public class Runner implements CommandLineRunner {
@@ -22,11 +25,34 @@ public class Runner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (initData) {
             userService.save(User.builder()
-                    .email("user")
+                    .email("user0")
+                    .password(passwordEncoder.encode("123"))
+                    .firstName("John")
+                    .lastName("Wick")
+                    .build());
+            userService.save(User.builder()
+                    .email("user1")
+                    .password(passwordEncoder.encode("123"))
+                    .firstName("John")
+                    .lastName("Wick")
+                    .build());
+            userService.save(User.builder()
+                    .email("user2")
+                    .password(passwordEncoder.encode("123"))
+                    .firstName("John")
+                    .lastName("Wick")
+                    .build());
+            userService.save(User.builder()
+                    .email("user3")
                     .password(passwordEncoder.encode("123"))
                     .firstName("John")
                     .lastName("Wick")
                     .build());
         }
+    }
+
+    public String dateFormat(LocalDateTime date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return date.format(formatter);
     }
 }

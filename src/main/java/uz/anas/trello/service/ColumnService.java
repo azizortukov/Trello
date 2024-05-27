@@ -13,7 +13,7 @@ public interface ColumnService {
     List<Column> findAllColumnsByUser(User user);
 
 
-    int findUserLatestColumnNum(User user);
+    int findLatestColumnNum();
 
     Column save(Column column);
 

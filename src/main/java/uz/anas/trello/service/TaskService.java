@@ -12,4 +12,7 @@ public interface TaskService {
     Task save(Task task);
 
     void changeTaskColumn(UUID taskId, UUID columnId);
+
+    Task findTaskById(UUID taskId);
+
 }

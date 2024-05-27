@@ -17,13 +17,13 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public List<Column> findAllColumnsByUser(User user) {
-        return columnRepo.findAllByOwnerOrderByColumnOrder(user);
+        return columnRepo.findAllColumnsByUserId(user.getId());
     }
 
     @Override
-    public int findUserLatestColumnNum(User user) {
-        Integer lastColum = columnRepo.findUserLatestColumnNum(user.getId());
-        return lastColum == null ? 1 : lastColum;
+    public int findLatestColumnNum() {
+        Integer lastColumn = columnRepo.findLatestColumnNum();
+        return lastColumn == null ? 1 : lastColumn;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public List<Column> findAll() {
-        return columnRepo.findAll();
+        return columnRepo.findAllByOrderByColumnOrder();
     }
 
     @Override

@@ -22,4 +22,10 @@ public class TaskServiceImpl implements TaskService {
     public void changeTaskColumn(UUID taskId, UUID columnId) {
         taskRepo.changeTaskColumn(taskId, columnId);
     }
+
+    @Override
+    public Task findTaskById(UUID taskId) {
+        return taskRepo.findById(taskId).orElse(null);
+    }
+
 }

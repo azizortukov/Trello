@@ -45,7 +45,7 @@
     <div class="row">
         <div class="col-12">
             <div class="d-flex overflow-auto">
-                <div class="col-3 mx-4 pb-4" th:each="i : ${#numbers.sequence(0, columns.size() - 1)}">
+                <div class="col-3 mx-4 pb-4" th:unless="${columns.size() == 0}" th:each="i : ${#numbers.sequence(0, columns.size() - 1)}">
                     <div class="card shadow rounded">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <form action="/column/move/previous" method="get">
@@ -66,6 +66,11 @@
                                 <button class="btn" name="task" th:unless="${i == 0}" th:value="${task.id} + '/' + ${columns.get(i - 1).id}"> <i class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
                                 </form>
                                 <p class="mb-0 flex-grow-1 text-center" th:text="${task.name}"></p>
+                                <form action="/task/conf">
+                                <button name="ids" th:value="${columns.get(i).id} + '/' + ${task.id}" class="btn">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                </form>
                                 <form action="/task/move" method="post">
                                 <button class="btn" name="task" th:unless="${i == columns.size() - 1}" th:value="${task.id} + '/' + ${columns.get(i + 1).id}"><i class="fa-solid fa-chevron-right" style="font-size: 12px;"></i></button>
                                 </form>

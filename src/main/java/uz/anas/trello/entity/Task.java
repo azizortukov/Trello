@@ -2,7 +2,6 @@ package uz.anas.trello.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,8 +23,6 @@ public class Task extends BaseEntity {
     private LocalDateTime deadline;
     private boolean finished;
     private boolean lateFinished;
-    @OneToMany
-    private List<Attachment> attachments;
     @ManyToMany
     private List<User> members;
 

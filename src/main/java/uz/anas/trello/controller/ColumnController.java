@@ -1,5 +1,6 @@
 package uz.anas.trello.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -19,16 +20,19 @@ import java.util.UUID;
 public class ColumnController {
 
     private final ColumnServiceImpl columnService;
+    private final HttpSession httpSession;
 
     @PostMapping("/add")
     public String addColumn(@RequestParam String columnName, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        int latestColOrder = columnService.findUserLatestColumnNum(user);
-        columnService.save(Column.builder()
-                .columnOrder(latestColOrder + 1)
-                .name(columnName)
-                .owner(user)
-                .build());
+        if (columnName != null && !columnName.isEmpty()) {
+            int latestColOrder = columnService.findLatestColumnNum();
+            columnService.save(Column.builder()
+                    .columnOrder(latestColOrder + 1)
+                    .name(columnName)
+                    .owner(user)
+                    .build());
+        }
         return "redirect:/";
     }
 

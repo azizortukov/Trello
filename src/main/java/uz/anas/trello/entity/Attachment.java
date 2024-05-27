@@ -1,6 +1,7 @@
 package uz.anas.trello.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,5 +17,8 @@ import lombok.experimental.SuperBuilder;
 public class Attachment extends BaseEntity {
 
     private byte[] content;
+    private String fileName;
+    @ManyToOne
+    private Task task;
 
 }
