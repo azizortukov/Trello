@@ -50,9 +50,20 @@ public class TaskController {
     @PostMapping("/move")
     public String moveTaskToNext(@RequestParam String task) {
         String[] split = task.split("/");
-        UUID taskId = UUID.fromString(split[0]);
-        UUID columnId = UUID.fromString(split[1]);
-        taskService.changeTaskColumn(taskId, columnId);
+        Task taskById = taskService.findTaskById(UUID.fromString(split[0]));
+        Column columnById = columnService.findById(UUID.fromString(split[1]));
+        if (columnService.findLatestColumnNum() == columnById.getColumnOrder()) {
+            if (taskById.getDeadline().isBefore(LocalDateTime.now())) {
+                taskById.setLateFinished(true);
+            }
+            taskById.setFinished(true);
+            taskService.save(taskById);
+        }else {
+            taskById.setFinished(false);
+            taskById.setLateFinished(false);
+            taskService.save(taskById);
+        }
+        taskService.changeTaskColumn(taskById.getId(), columnById.getId());
         return "redirect:/";
     }
 

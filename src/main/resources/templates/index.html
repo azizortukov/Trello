@@ -38,7 +38,7 @@
 </div>
 <div class="row">
     <div class="col-12">
-        <h1 class="text-center my-4">Trello-like Board</h1>
+        <h1 class="text-center my-4">Board</h1>
     </div>
 </div>
 <div class="col-10 offset-1">
@@ -65,7 +65,8 @@
                                 <form action="/task/move" method="post">
                                 <button class="btn" name="task" th:unless="${i == 0}" th:value="${task.id} + '/' + ${columns.get(i - 1).id}"> <i class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
                                 </form>
-                                <p class="mb-0 flex-grow-1 text-center" th:text="${task.name}"></p>
+                                <p th:class="${task.isLateFinished()} ? 'mb-0 flex-grow-1 text-center text-danger' : 'mb-0 flex-grow-1 text-center' "
+                                   th:text="${task.name}"><i class="fa-solid fa-business-time"></i></p>
                                 <form action="/task/conf">
                                 <button name="ids" th:value="${columns.get(i).id} + '/' + ${task.id}" class="btn">
                                     <i class="fa-solid fa-pen-to-square"></i>
