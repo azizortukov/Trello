@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.User;
+import uz.anas.trello.model.ColumnReportDto;
 import uz.anas.trello.repo.ColumnRepo;
 
 import java.util.List;
@@ -46,6 +47,10 @@ public class ColumnServiceImpl implements ColumnService {
         return columnRepo.findByColumnOrder(desiredOrder);
     }
 
+    @Override
+    public List<ColumnReportDto> getColumnsReport() {
+        return columnRepo.getColumnsReport();
+    }
 
 
 }

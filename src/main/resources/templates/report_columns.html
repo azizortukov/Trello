@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,36 +14,14 @@
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
             <tr>
-                <th >User</th>
-                <th >Late Finished Tasks</th>
-                <th >Finished on Time Tasks</th>
-                <th >Overall Finished Tasks</th>
+                <th>Column Name</th>
+                <th>Tasks Count</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>John Doe</td>
-                <td>5</td>
-                <td>10</td>
-                <td>15</td>
-            </tr>
-            <tr>
-                <td>Jane Smith</td>
-                <td>2</td>
-                <td>12</td>
-                <td>14</td>
-            </tr>
-            <tr>
-                <td>Emily Johnson</td>
-                <td>3</td>
-                <td>9</td>
-                <td>12</td>
-            </tr>
-            <tr>
-                <td>Michael Brown</td>
-                <td>4</td>
-                <td>8</td>
-                <td>12</td>
+            <tr th:each="column : ${columns}">
+                <td th:text="${column.name}"></td>
+                <td th:text="${column.count}"></td>
             </tr>
             </tbody>
         </table>

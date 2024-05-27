@@ -3,6 +3,7 @@ package uz.anas.trello.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.anas.trello.entity.User;
+import uz.anas.trello.model.UserReportDto;
 import uz.anas.trello.repo.UserRepo;
 
 import java.util.List;
@@ -32,5 +33,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findAllByTaskId(UUID taskId) {
         return userRepo.findAllByTaskIdNot(taskId);
+    }
+
+    @Override
+    public List<UserReportDto> getUsersReport() {
+        return userRepo.findAllUsersReport();
     }
 }

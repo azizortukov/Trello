@@ -39,22 +39,18 @@ public class ColumnController {
 
     @GetMapping("/move/next")
     public String moveColumnToNext(@RequestParam UUID columnId) {
+
+
         Column column = columnService.findById(columnId);
         int desiredOrder = column.getColumnOrder() + 1;
         Column columnByOrder = columnService.findByOrder(desiredOrder);
+
+        checkRemoveLatest(columnByOrder);
         columnByOrder.setColumnOrder(desiredOrder - 1);
         column.setColumnOrder(desiredOrder);
+
         //Check if the setting column will be finish column, then set the tasks as finished
-        int latestColumnNum = columnService.findLatestColumnNum();
-        if (latestColumnNum == column.getColumnOrder()) {
-            column.getTasks().forEach(task -> {
-                if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDateTime.now())) {
-                    task.setLateFinished(true);
-                }
-                task.setFinished(true);
-                taskServiceImpl.save(task);
-            });
-        }
+        checkAddLatest(column, column.getColumnOrder());
 
         columnService.save(column);
         columnService.save(columnByOrder);
@@ -65,7 +61,19 @@ public class ColumnController {
     @GetMapping("/move/previous")
     public String moveColumnToPrevious(@RequestParam UUID columnId) {
         Column column = columnService.findById(columnId);
-        //Check if the setting column was the finish column, if it was, then set the tasks as not finished
+        //
+        checkRemoveLatest(column);
+        int desiredOrder = column.getColumnOrder() - 1;
+        Column columnByOrder = columnService.findByOrder(desiredOrder);
+        columnByOrder.setColumnOrder(desiredOrder + 1);
+        checkAddLatest(columnByOrder, columnByOrder.getColumnOrder());
+        column.setColumnOrder(desiredOrder);
+        columnService.save(column);
+        columnService.save(columnByOrder);
+        return "redirect:/";
+    }
+
+    private void checkRemoveLatest(Column column) {
         int latestColumnNum = columnService.findLatestColumnNum();
         if (latestColumnNum == column.getColumnOrder()) {
             column.getTasks().forEach(task -> {
@@ -74,18 +82,19 @@ public class ColumnController {
                 taskServiceImpl.save(task);
             });
         }
+    }
 
-        int desiredOrder = column.getColumnOrder() - 1;
-        Column columnByOrder = columnService.findByOrder(desiredOrder);
-        columnByOrder.setColumnOrder(desiredOrder + 1);
-        column.setColumnOrder(desiredOrder);
-
-
-
-
-        columnService.save(column);
-        columnService.save(columnByOrder);
-        return "redirect:/";
+    private void checkAddLatest( Column columnByOrder, Integer columnOrder) {
+        int latestColumnNum = columnService.findLatestColumnNum();
+        if (columnOrder == latestColumnNum) {
+            columnByOrder.getTasks().forEach(task -> {
+                if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDateTime.now())) {
+                    task.setLateFinished(true);
+                }
+                task.setFinished(true);
+                taskServiceImpl.save(task);
+            });
+        }
     }
 
 }

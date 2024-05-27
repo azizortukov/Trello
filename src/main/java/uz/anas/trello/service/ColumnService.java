@@ -3,6 +3,7 @@ package uz.anas.trello.service;
 import org.springframework.stereotype.Service;
 import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.User;
+import uz.anas.trello.model.ColumnReportDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,4 +23,6 @@ public interface ColumnService {
     List<Column> findAll();
 
     Column findByOrder(int desiredOrder);
+
+    List<ColumnReportDto> getColumnsReport();
 }

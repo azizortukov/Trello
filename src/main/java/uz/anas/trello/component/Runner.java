@@ -1,5 +1,6 @@
 package uz.anas.trello.component;
 
+import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -23,30 +24,31 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        Faker faker = new Faker();
         if (initData) {
             userService.save(User.builder()
                     .email("user0")
                     .password(passwordEncoder.encode("123"))
-                    .firstName("John")
-                    .lastName("Wick")
+                    .firstName(faker.name().firstName())
+                    .lastName(faker.name().lastName())
                     .build());
             userService.save(User.builder()
                     .email("user1")
                     .password(passwordEncoder.encode("123"))
-                    .firstName("John")
-                    .lastName("Wick")
+                    .firstName(faker.name().firstName())
+                    .lastName(faker.name().lastName())
                     .build());
             userService.save(User.builder()
                     .email("user2")
                     .password(passwordEncoder.encode("123"))
-                    .firstName("John")
-                    .lastName("Wick")
+                    .firstName(faker.name().firstName())
+                    .lastName(faker.name().lastName())
                     .build());
             userService.save(User.builder()
                     .email("user3")
                     .password(passwordEncoder.encode("123"))
-                    .firstName("John")
-                    .lastName("Wick")
+                    .firstName(faker.name().firstName())
+                    .lastName(faker.name().lastName())
                     .build());
         }
     }
