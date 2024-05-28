@@ -98,17 +98,27 @@
                 <div th:each="comment : ${comments}">
                     <li class="list-group-item d-flex justify-content-between align-items-center rounded">
                         <span th:text="${comment.text}"></span>
-                        <small th:unless="${comments.size() == 0}" th:text="${@runner.dateFormat(comment.createdAt)}"
-                               class="text-muted"></small>
+                        <a th:href="'/task/archive/comment/' + ${comment.id}" class="btn ms-3"><i class="fa-solid fa-trash-can"></i></a>
                     </li>
-                    <small class="text-muted d-flex justify-content-end me-2" th:text="${comment.user.email}"></small>
+                    <small class="text-muted d-flex justify-content-end me-2"
+                           th:text="${comment.user.firstName} + ' ' + ${comment.user.lastName} + ' - ' + ${@runner.dateFormat(comment.createdAt)}"></small>
                 </div>
             </ul>
         </div>
     </form>
     <div class="text-center">
+        <a class="btn btn-danger" th:href="'/task/archive/' + ${task.id}" id="archiveLink">Archive</a>
         <a class="btn btn-secondary" href="/">Back</a>
     </div>
+
 </div>
+<script>
+    document.getElementById("archiveLink").addEventListener("click", function(event) {
+        var confirmed = confirm("Are you sure you want to archive this task?");
+        if (!confirmed) {
+            event.preventDefault();
+        }
+    });
+</script>
 </body>
 </html>

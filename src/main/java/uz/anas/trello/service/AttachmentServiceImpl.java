@@ -1,5 +1,6 @@
 package uz.anas.trello.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         return attachmentRepo.findAllByTaskId(taskId);
     }
 
+    @SneakyThrows
     @Override
-    public Attachment findById(UUID attachmentId) {
-        return attachmentRepo.findById(attachmentId).orElse(null);
+    public void sendFileToResponse(UUID attachmentId, HttpServletResponse response) {
+        Attachment attachment = attachmentRepo.findById(attachmentId).orElseThrow(RuntimeException::new);
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + attachment.getFileName());
+        response.getOutputStream().write(attachment.getContent());
     }
 }

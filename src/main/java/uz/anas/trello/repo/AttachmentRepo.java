@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface AttachmentRepo extends JpaRepository<Attachment, UUID> {
 
     List<Attachment> findAllByTaskId(UUID taskId);
+
 }

@@ -3,17 +3,12 @@ package uz.anas.trello.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import uz.anas.trello.entity.Attachment;
 import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.Task;
 import uz.anas.trello.entity.User;
@@ -35,35 +30,20 @@ public class TaskController {
     private final AttachmentServiceImpl attachmentService;
 
     @PostMapping("/add")
-    public String addTask(@RequestParam String taskName,
-                          @RequestParam UUID columnId) {
-        if (taskName != null && !taskName.isEmpty() && columnId != null) {
-            Column column = columnService.findById(columnId);
-            column.getTasks().add(taskService.save(Task.builder()
-                    .name(taskName)
-                    .build()));
-            columnService.save(column);
+    public String addTask(@RequestParam String taskName, @RequestParam UUID columnId, @AuthenticationPrincipal User user) {
+        if (!user.getUsername().equals("jason")) {
+            return "redirect:/";
         }
+        taskService.addTaskToColumn(taskName, columnId);
         return "redirect:/";
     }
 
     @PostMapping("/move")
-    public String moveTaskToNext(@RequestParam String task) {
-        String[] split = task.split("/");
-        Task taskById = taskService.findTaskById(UUID.fromString(split[0]));
-        Column columnById = columnService.findById(UUID.fromString(split[1]));
-        if (columnService.findLatestColumnNum() == columnById.getColumnOrder()) {
-            if (taskById.getDeadline().isBefore(LocalDateTime.now())) {
-                taskById.setLateFinished(true);
-            }
-            taskById.setFinished(true);
-            taskService.save(taskById);
-        }else {
-            taskById.setFinished(false);
-            taskById.setLateFinished(false);
-            taskService.save(taskById);
+    public String moveTask(@RequestParam String task, @AuthenticationPrincipal User user) {
+        if (!user.getUsername().equals("jason")) {
+            return "redirect:/";
         }
-        taskService.changeTaskColumn(taskById.getId(), columnById.getId());
+        taskService.moveTask(task);
         return "redirect:/";
     }
 
@@ -86,7 +66,6 @@ public class TaskController {
         return "task_config";
     }
 
-    @SneakyThrows
     @PostMapping("/edit")
     public String edit(@AuthenticationPrincipal User user,
                        @RequestParam(required = false) String columnName,
@@ -130,13 +109,21 @@ public class TaskController {
         return "redirect:/task/conf";
     }
 
-    @SneakyThrows
     @GetMapping("/file/download")
     public void fileDownload(@RequestParam UUID attachmentId, HttpServletResponse response) {
-        Attachment attachment = attachmentService.findById(attachmentId);
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + attachment.getFileName());
-        response.getOutputStream().write(attachment.getContent());
+        attachmentService.sendFileToResponse(attachmentId, response);
+    }
+
+    @GetMapping("/archive/{taskId}")
+    public String archiveTask(@PathVariable UUID taskId) {
+        taskService.archiveById(taskId);
+        return "redirect:/";
+    }
+
+    @GetMapping("/archive/comment/{commentId}")
+    public String archiveComment(@PathVariable UUID commentId) {
+        commentService.archiveById(commentId);
+        return "redirect:/task/conf";
     }
 
 }

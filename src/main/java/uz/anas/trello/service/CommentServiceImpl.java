@@ -19,11 +19,24 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void addCommentByTaskId(Task taskById, String comment, User user) {
-        commentRepo.save(new Comment(comment, LocalDateTime.now(), user, taskById));
+        commentRepo.save(Comment.builder()
+                .task(taskById)
+                .text(comment)
+                .createdAt(LocalDateTime.now())
+                .user(user)
+                .build());
     }
 
     @Override
     public List<Comment> findAllByTaskId(UUID taskId) {
-        return commentRepo.findAllByTaskIdOrderByCreatedAt(taskId);
+        return commentRepo.findAllByTaskIdAndNotArchived(taskId);
+    }
+
+    @Override
+    public void archiveById(UUID id) {
+        commentRepo.findById(id).ifPresent(comment -> {
+            comment.setArchived(true);
+            commentRepo.save(comment);
+        });
     }
 }

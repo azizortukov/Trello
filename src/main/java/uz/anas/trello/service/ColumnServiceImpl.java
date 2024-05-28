@@ -2,7 +2,9 @@ package uz.anas.trello.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.anas.trello.component.Runner;
 import uz.anas.trello.entity.Column;
+import uz.anas.trello.entity.Task;
 import uz.anas.trello.entity.User;
 import uz.anas.trello.model.ColumnReportDto;
 import uz.anas.trello.repo.ColumnRepo;
@@ -15,16 +17,23 @@ import java.util.UUID;
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepo columnRepo;
+    private final Runner runner;
 
     @Override
     public List<Column> findAllColumnsByUser(User user) {
-        return columnRepo.findAllColumnsByUserId(user.getId());
+        List<Column> columns = columnRepo.findAllColumnsByUserId(user.getId());
+        columns.forEach(column -> {
+            List <Task> userTasks = column.getTasks().stream()
+                    .filter(task -> runner.checkTaskMembers(task.getMembers(), user.getId())).toList();
+            column.setTasks(userTasks);
+        });
+        return columns;
     }
 
     @Override
     public int findLatestColumnNum() {
         Integer lastColumn = columnRepo.findLatestColumnNum();
-        return lastColumn == null ? 1 : lastColumn;
+        return lastColumn == null ? 0 : lastColumn;
     }
 
     @Override
@@ -43,14 +52,49 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public Column findByOrder(int desiredOrder) {
-        return columnRepo.findByColumnOrder(desiredOrder);
-    }
-
-    @Override
     public List<ColumnReportDto> getColumnsReport() {
         return columnRepo.getColumnsReport();
     }
 
+    @Override
+    public void moveColumnNext(UUID columnId) {
+        Column column = columnRepo.findById(columnId).orElseThrow(RuntimeException::new);
+        int desiredOrder = column.getColumnOrder() + 1;
+        Column nextColumn = columnRepo.findByColumnOrder(desiredOrder);
+        nextColumn.setColumnOrder(desiredOrder - 1);
+        column.setColumnOrder(desiredOrder);
+        columnRepo.save(column);
+        columnRepo.save(nextColumn);
+    }
+
+    @Override
+    public void moveColumnPrevious(UUID columnId) {
+        Column column = columnRepo.findById(columnId).orElseThrow(RuntimeException::new);
+        int desiredOrder = column.getColumnOrder() - 1;
+        Column previousColumn = columnRepo.findByColumnOrder(desiredOrder);
+        previousColumn.setColumnOrder(desiredOrder + 1);
+        column.setColumnOrder(desiredOrder);
+        columnRepo.save(column);
+        columnRepo.save(previousColumn);
+    }
+
+    @Override
+    public void buildAndSave(String columnName, Boolean finishLine) {
+        if (columnName != null && !columnName.isEmpty()) {
+            int latestColOrder = findLatestColumnNum();
+            columnRepo.save(Column.builder()
+                    .columnOrder(latestColOrder + 1)
+                    .finishLine(finishLine)
+                    .name(columnName)
+                    .build());
+        }
+    }
+
+    @Override
+    public void archiveById(UUID columnId) {
+        Column column = columnRepo.findById(columnId).orElseThrow(RuntimeException::new);
+        column.setArchived(true);
+        columnRepo.save(column);
+    }
 
 }

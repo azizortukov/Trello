@@ -1,18 +1,15 @@
 package uz.anas.trello.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.User;
 import uz.anas.trello.service.ColumnServiceImpl;
-import uz.anas.trello.service.TaskServiceImpl;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Controller
@@ -21,80 +18,38 @@ import java.util.UUID;
 public class ColumnController {
 
     private final ColumnServiceImpl columnService;
-    private final TaskServiceImpl taskServiceImpl;
 
     @PostMapping("/add")
-    public String addColumn(@RequestParam String columnName, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (columnName != null && !columnName.isEmpty()) {
-            int latestColOrder = columnService.findLatestColumnNum();
-            columnService.save(Column.builder()
-                    .columnOrder(latestColOrder + 1)
-                    .name(columnName)
-                    .owner(user)
-                    .build());
-        }
+    public String addColumn(@RequestParam String columnName, @RequestParam(defaultValue = "false") Boolean finishLine) {
+        columnService.buildAndSave(columnName, finishLine);
         return "redirect:/";
     }
 
     @GetMapping("/move/next")
-    public String moveColumnToNext(@RequestParam UUID columnId) {
-
-
-        Column column = columnService.findById(columnId);
-        int desiredOrder = column.getColumnOrder() + 1;
-        Column columnByOrder = columnService.findByOrder(desiredOrder);
-
-        checkRemoveLatest(columnByOrder);
-        columnByOrder.setColumnOrder(desiredOrder - 1);
-        column.setColumnOrder(desiredOrder);
-
-        //Check if the setting column will be finish column, then set the tasks as finished
-        checkAddLatest(column, column.getColumnOrder());
-
-        columnService.save(column);
-        columnService.save(columnByOrder);
+    public String moveColumnToNext(@RequestParam UUID columnId, @AuthenticationPrincipal User user) {
+        if (!user.getUsername().equals("jason")) {
+            return "redirect:/";
+        }
+        columnService.moveColumnNext(columnId);
         return "redirect:/";
     }
-
 
     @GetMapping("/move/previous")
-    public String moveColumnToPrevious(@RequestParam UUID columnId) {
-        Column column = columnService.findById(columnId);
-        //
-        checkRemoveLatest(column);
-        int desiredOrder = column.getColumnOrder() - 1;
-        Column columnByOrder = columnService.findByOrder(desiredOrder);
-        columnByOrder.setColumnOrder(desiredOrder + 1);
-        checkAddLatest(columnByOrder, columnByOrder.getColumnOrder());
-        column.setColumnOrder(desiredOrder);
-        columnService.save(column);
-        columnService.save(columnByOrder);
+    public String moveColumnToPrevious(@RequestParam UUID columnId, @AuthenticationPrincipal User user) {
+        if (!user.getUsername().equals("jason")) {
+            return "redirect:/";
+        }
+        columnService.moveColumnPrevious(columnId);
         return "redirect:/";
     }
 
-    private void checkRemoveLatest(Column column) {
-        int latestColumnNum = columnService.findLatestColumnNum();
-        if (latestColumnNum == column.getColumnOrder()) {
-            column.getTasks().forEach(task -> {
-                task.setLateFinished(false);
-                task.setFinished(false);
-                taskServiceImpl.save(task);
-            });
+    @PostMapping("/move/archive")
+    public String moveColumnToArchive(@RequestParam UUID columnId, @AuthenticationPrincipal User user) {
+        if (!user.getUsername().equals("jason")) {
+            return "redirect:/";
         }
-    }
-
-    private void checkAddLatest( Column columnByOrder, Integer columnOrder) {
-        int latestColumnNum = columnService.findLatestColumnNum();
-        if (columnOrder == latestColumnNum) {
-            columnByOrder.getTasks().forEach(task -> {
-                if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDateTime.now())) {
-                    task.setLateFinished(true);
-                }
-                task.setFinished(true);
-                taskServiceImpl.save(task);
-            });
-        }
+        columnService.archiveById(columnId);
+        return "redirect:/";
     }
 
 }

@@ -15,4 +15,6 @@ public interface CommentService {
     void addCommentByTaskId(Task taskById, String comment, User user);
 
     List<Comment> findAllByTaskId(UUID taskId);
+
+    void archiveById(UUID id);
 }

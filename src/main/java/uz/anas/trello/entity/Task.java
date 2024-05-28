@@ -25,5 +25,6 @@ public class Task extends BaseEntity {
     private boolean lateFinished;
     @ManyToMany
     private List<User> members;
+    private boolean isArchived;
 
 }

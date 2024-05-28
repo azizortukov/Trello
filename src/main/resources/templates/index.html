@@ -9,6 +9,7 @@
         .overflow-auto {
             white-space: nowrap;
         }
+
         .overflow-auto .col-3, .overflow-auto .col-2 {
             display: inline-block;
             float: none; /* Override Bootstrap's default column float */
@@ -28,13 +29,13 @@
             <ul class="navbar-nav ">
                 <li class="nav-item">
                     <a class="nav-link" th:href="${filtered} ? '/?filtered=false' : '/?filtered=true'"
-                    th:text="${filtered} ? 'All Tasks' : 'My Tasks'"></a>
+                       th:text="${filtered} ? 'All Tasks' : 'My Tasks'"></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/report/members">Members' Statistics</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Column Statistics</a>
+                    <a class="nav-link" href="/report/columns">Column Statistics</a>
                 </li>
             </ul>
         </div>
@@ -49,35 +50,52 @@
     <div class="row">
         <div class="col-12">
             <div class="d-flex overflow-auto">
-                <div class="col-3 mx-4 pb-4" th:unless="${columns.size() == 0}" th:each="i : ${#numbers.sequence(0, columns.size() - 1)}">
+                <div class="col-3 mx-4 pb-4" th:unless="${columns.size() == 0}"
+                     th:each="i : ${#numbers.sequence(0, columns.size() - 1)}">
                     <div class="card shadow rounded">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <form action="/column/move/previous" method="get">
                                 <div th:unless="${i == 0}">
-                                    <button class="btn btn-outline-dark" name="columnId" th:value="${columns.get(i).id}"><</button>
+                                    <button class="btn btn-outline-dark" name="columnId"
+                                            th:value="${columns.get(i).id}"><
+                                    </button>
                                 </div>
                             </form>
                             <p class="mb-0 flex-grow-1 text-center" th:text="${columns.get(i).name}"></p>
+                            <form  action="/column/move/archive" method="post">
+                                <button type="submit" class="btn" name="columnId" th:value="${columns.get(i).id}">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
                             <form action="/column/move/next" method="get">
                                 <div th:unless="${i == columns.size() - 1}">
-                                    <button class="btn btn-outline-dark" name="columnId" th:value="${columns.get(i).id}">></button>
+                                    <button class="btn btn-outline-dark" name="columnId"
+                                            th:value="${columns.get(i).id}">>
+                                    </button>
                                 </div>
                             </form>
                         </div>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center" th:each="task : ${columns.get(i).tasks}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                th:each="task : ${columns.get(i).tasks}" th:unless="${task.archived}">
                                 <form action="/task/move" method="post">
-                                <button class="btn" name="task" th:unless="${i == 0}" th:value="${task.id} + '/' + ${columns.get(i - 1).id}"> <i class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
+                                    <button class="btn" name="task" th:unless="${i == 0}"
+                                            th:value="${task.id} + '/' + ${columns.get(i - 1).id}"><i
+                                            class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
                                 </form>
                                 <p th:class="${task.isLateFinished()} ? 'mb-0 flex-grow-1 text-center text-danger' : 'mb-0 flex-grow-1 text-center' "
-                                   th:text="${task.name}"><i class="fa-solid fa-business-time"></i></p>
+                                   th:text="${task.name}"></p>
+                                <i th:unless="${task.deadline == null}"
+                                   th:class="${task.isLateFinished() || @runner.checkBefore(task.deadline)} ? 'fa-solid fa-business-time text-danger' : 'fa-solid fa-business-time'"></i>
                                 <form action="/task/conf">
-                                <button name="ids" th:value="${columns.get(i).id} + '/' + ${task.id}" class="btn">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
+                                    <button name="ids" th:value="${columns.get(i).id} + '/' + ${task.id}" class="btn">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
                                 </form>
                                 <form action="/task/move" method="post">
-                                <button class="btn" name="task" th:unless="${i == columns.size() - 1}" th:value="${task.id} + '/' + ${columns.get(i + 1).id}"><i class="fa-solid fa-chevron-right" style="font-size: 12px;"></i></button>
+                                    <button class="btn" name="task" th:unless="${i == columns.size() - 1}"
+                                            th:value="${task.id} + '/' + ${columns.get(i + 1).id}"><i
+                                            class="fa-solid fa-chevron-right" style="font-size: 12px;"></i></button>
                                 </form>
                             </li>
                             <li class="list-group-item text-center">
@@ -95,15 +113,18 @@
                 <div class="col-2 text-center">
                     <form action="/column/add" method="post">
                         <div class="form-group ms-5">
-                            <input type="text" class="form-control" name="columnName" placeholder="List name">
+                            <input type="text" class="form-control" name="columnName" placeholder="Column name">
                         </div>
-                        <button class="btn btn-success">Add New List</button>
+                        <div class="form-group ms-5">
+                            <input type="checkbox" class="form-check-input" name="finishLine" id="finishLine">
+                            <label class="form-check-label" for="finishLine">Mark as finish column</label>
+                        </div>
+                        <button class="btn btn-success">Add New Column</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 </body>
 </html>

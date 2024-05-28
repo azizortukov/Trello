@@ -1,5 +1,6 @@
 package uz.anas.trello.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.anas.trello.entity.Attachment;
@@ -18,5 +19,5 @@ public interface AttachmentService {
 
     List<Attachment> findAllByTaskId(UUID taskId);
 
-    Attachment findById(UUID attachmentId);
+    void sendFileToResponse(UUID attachmentId, HttpServletResponse response);
 }

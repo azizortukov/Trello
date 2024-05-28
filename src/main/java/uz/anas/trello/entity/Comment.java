@@ -24,5 +24,6 @@ public class Comment extends BaseEntity {
     private User user;
     @ManyToOne
     private Task task;
+    private boolean isArchived;
 
 }

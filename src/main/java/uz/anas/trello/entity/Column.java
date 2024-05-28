@@ -1,7 +1,6 @@
 package uz.anas.trello.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,9 +21,9 @@ import java.util.List;
 public class Column extends BaseEntity {
 
     private String name;
-    @ManyToOne
-    private User owner;
     private Integer columnOrder;
+    private boolean finishLine;
     @OneToMany
     private List<Task> tasks;
+    private boolean isArchived;
 }

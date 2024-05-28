@@ -23,10 +23,14 @@ public class IndexController {
     public String index(Model model,
                         @AuthenticationPrincipal User user,
                         @RequestParam(required = false) boolean filtered) {
-        List<Column> columns = filtered? columnService.findAllColumnsByUser(user):columnService.findAll();
+        List<Column> columns = filtered ? columnService.findAllColumnsByUser(user) : columnService.findAll();
+        if (filtered) {
+            model.addAttribute("userId", user.getId());
+        }
         model.addAttribute("columns", columns);
         model.addAttribute("filtered", filtered);
         return "index";
     }
+
 
 }

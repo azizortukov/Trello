@@ -13,7 +13,6 @@ public interface ColumnService {
 
     List<Column> findAllColumnsByUser(User user);
 
-
     int findLatestColumnNum();
 
     Column save(Column column);
@@ -22,7 +21,13 @@ public interface ColumnService {
 
     List<Column> findAll();
 
-    Column findByOrder(int desiredOrder);
-
     List<ColumnReportDto> getColumnsReport();
+
+    void moveColumnNext(UUID columnId);
+
+    void moveColumnPrevious(UUID columnId);
+
+    void buildAndSave(String columnName, Boolean finishLine);
+
+    void archiveById(UUID columnId);
 }

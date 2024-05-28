@@ -15,4 +15,11 @@ public interface TaskService {
 
     Task findTaskById(UUID taskId);
 
+    void addTaskToColumn(String taskName, UUID columnId);
+
+    void moveTask(String task);
+
+    int getFinishColNum();
+
+    void archiveById(UUID id);
 }
