@@ -21,7 +21,7 @@ public class Runner implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         Faker faker = new Faker();
         if (userService.findAll().isEmpty()) {
             userService.save(User.builder()
