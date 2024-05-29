@@ -90,6 +90,7 @@ public class TaskServiceImpl implements TaskService {
             taskById.getMembers().remove(userRepo.findById(removeUserId).orElse(null));
         }
         if (taskDeadLine != null) {
+            taskById.setLateFinished(taskDeadLine.isBefore(LocalDateTime.now()) && taskById.isFinished());
             taskById.setDeadline(taskDeadLine);
         }
         taskRepo.save(taskById);

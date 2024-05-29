@@ -62,7 +62,7 @@
                                 </div>
                             </form>
                             <h5 class="mb-0 flex-grow-1 text-center" th:text="${columns.get(i).name}"></h5>
-                            <form  action="/column/move/archive" method="post">
+                            <form action="/column/move/archive" method="post">
                                 <button type="submit" class="btn" name="columnId" th:value="${columns.get(i).id}">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -83,10 +83,13 @@
                                             th:value="${task.id} + '/' + ${columns.get(i - 1).id}"><i
                                             class="fa-solid fa-chevron-left" style="font-size: 12px;"></i></button>
                                 </form>
-                                <p th:class="${task.isLateFinished()} ? 'mb-0 flex-grow-1 text-center text-danger' : 'mb-0 flex-grow-1 text-center' "
+                                <p th:class="${task.isLateFinished()} ? 'mb-0 flex-grow-1 text-center text-danger font-weight-bold' :
+                                    (${task.finished} ? 'mb-0 flex-grow-1 text-center text-success font-weight-bold' : 'mb-0 flex-grow-1 text-center')"
                                    th:text="${task.name}"></p>
+
                                 <i th:unless="${task.deadline == null}"
-                                   th:class="${task.isLateFinished() || @runner.checkBefore(task.deadline)} ? 'fa-solid fa-business-time text-danger' : 'fa-solid fa-business-time'"></i>
+                                   th:class="${task.isLateFinished() || @runner.checkBefore(task.deadline)} ? 'fa-solid fa-business-time text-danger font-weight-bold' :
+                                   (${task.finished} ? 'fa-solid fa-business-time text-success font-weight-bold' : 'fa-solid fa-business-time')"></i>
                                 <form action="/task/conf">
                                     <button name="ids" th:value="${columns.get(i).id} + '/' + ${task.id}" class="btn">
                                         <i class="fa-solid fa-pen-to-square"></i>
