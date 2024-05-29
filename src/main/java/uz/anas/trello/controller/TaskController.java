@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.Task;
 import uz.anas.trello.entity.User;
 import uz.anas.trello.service.*;
@@ -31,20 +30,37 @@ public class TaskController {
 
     @PostMapping("/add")
     public String addTask(@RequestParam String taskName, @RequestParam UUID columnId, @AuthenticationPrincipal User user) {
-        if (!user.getUsername().equals("jason")) {
-            return "redirect:/";
+        if (userService.checkAdmin(user)) {
+            taskService.addTaskToColumn(taskName, columnId);
         }
-        taskService.addTaskToColumn(taskName, columnId);
         return "redirect:/";
     }
 
     @PostMapping("/move")
     public String moveTask(@RequestParam String task, @AuthenticationPrincipal User user) {
-        if (!user.getUsername().equals("jason")) {
-            return "redirect:/";
+        if (userService.checkAdmin(user)) {
+            taskService.moveTask(task);
         }
-        taskService.moveTask(task);
         return "redirect:/";
+    }
+
+    @PostMapping("/edit")
+    public String edit(@AuthenticationPrincipal User user,
+                       @RequestParam(required = false) String columnName, @RequestParam(required = false) String taskName,
+                       @RequestParam(required = false) UUID addUserId, @RequestParam(required = false) UUID removeUserId,
+                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime taskDeadLine,
+                       @RequestParam(required = false) MultipartFile fileUpload, @RequestParam(required = false) UUID attachmentId,
+                       @RequestParam(required = false) String comment
+    ) {
+        Task taskById = taskService.findTaskById((UUID) httpSession.getAttribute("taskId"));
+        commentService.addCommentByTaskId(taskById, comment, user);
+        attachmentService.saveAttachment(fileUpload, taskById);
+        attachmentService.removeById(attachmentId);
+        if (userService.checkAdmin(user)) {
+            columnService.updateColumn(columnName, httpSession);
+            taskService.updateTask(taskName, addUserId, removeUserId, taskDeadLine, taskById);
+        }
+        return "redirect:/task/conf";
     }
 
     @GetMapping("/conf")
@@ -66,57 +82,16 @@ public class TaskController {
         return "task_config";
     }
 
-    @PostMapping("/edit")
-    public String edit(@AuthenticationPrincipal User user,
-                       @RequestParam(required = false) String columnName,
-                       @RequestParam(required = false) String taskName,
-                       @RequestParam(required = false) UUID addUserId,
-                       @RequestParam(required = false) UUID removeUserId,
-                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                       LocalDateTime taskDeadLine,
-                       @RequestParam(required = false) MultipartFile fileUpload,
-                       @RequestParam(required = false) UUID attachmentId,
-                       @RequestParam(required = false) String comment
-    ) {
-        Column column = columnService.findById((UUID) httpSession.getAttribute("columnId"));
-        Task taskById = taskService.findTaskById((UUID) httpSession.getAttribute("taskId"));
-        if (columnName != null && !columnName.isEmpty()) {
-            column.setName(columnName);
-            columnService.save(column);
-        }
-        if (taskName != null && !taskName.isEmpty()) {
-            taskById.setName(taskName);
-        }
-        if (addUserId != null) {
-            taskById.getMembers().add(userService.findById(addUserId));
-        }
-        if (removeUserId != null) {
-            taskById.getMembers().remove(userService.findById(removeUserId));
-        }
-        if (taskDeadLine != null) {
-            taskById.setDeadline(taskDeadLine);
-        }
-        if (comment != null && !comment.isEmpty()) {
-            commentService.addCommentByTaskId(taskById, comment, user);
-        }
-        if (fileUpload != null && !fileUpload.isEmpty()) {
-            attachmentService.saveAttachment(fileUpload, taskById);
-        }
-        if (attachmentId != null) {
-            attachmentService.removeById(attachmentId);
-        }
-        taskService.save(taskById);
-        return "redirect:/task/conf";
-    }
-
     @GetMapping("/file/download")
     public void fileDownload(@RequestParam UUID attachmentId, HttpServletResponse response) {
         attachmentService.sendFileToResponse(attachmentId, response);
     }
 
     @GetMapping("/archive/{taskId}")
-    public String archiveTask(@PathVariable UUID taskId) {
-        taskService.archiveById(taskId);
+    public String archiveTask(@PathVariable UUID taskId, @AuthenticationPrincipal User user) {
+        if (userService.checkAdmin(user)) {
+            taskService.archiveById(taskId);
+        }
         return "redirect:/";
     }
 

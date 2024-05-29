@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepo extends JpaRepository<User, UUID> {
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
 
     @Query(nativeQuery = true, value = """
             select u.* from users u
@@ -34,4 +34,6 @@ public interface UserRepo extends JpaRepository<User, UUID> {
             left join public.task t on t.id = tm.task_id and t.finished = true
             group by u.id""")
     List<UserReportDto> findAllUsersReport();
+
+    boolean existsByUsername(String username);
 }

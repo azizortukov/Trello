@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.User;
 import uz.anas.trello.service.ColumnServiceImpl;
+import uz.anas.trello.service.UserServiceImpl;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class IndexController {
 
     private final ColumnServiceImpl columnService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping
     public String index(Model model,
@@ -31,6 +33,5 @@ public class IndexController {
         model.addAttribute("filtered", filtered);
         return "index";
     }
-
 
 }

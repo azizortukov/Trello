@@ -26,17 +26,12 @@ public class User extends BaseEntity implements UserDetails {
     private String firstName;
     private String lastName;
     @Column(unique = true, nullable = false)
-    private String email;
+    private String username;
     private String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
     }
 
     @Override

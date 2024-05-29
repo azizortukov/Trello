@@ -1,5 +1,6 @@
 package uz.anas.trello.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.anas.trello.component.Runner;
@@ -95,6 +96,15 @@ public class ColumnServiceImpl implements ColumnService {
         Column column = columnRepo.findById(columnId).orElseThrow(RuntimeException::new);
         column.setArchived(true);
         columnRepo.save(column);
+    }
+
+    @Override
+    public void updateColumn(String columnName, HttpSession httpSession) {
+        if (columnName != null && !columnName.isEmpty()) {
+            Column column = columnRepo.findById((UUID) httpSession.getAttribute("columnId")).orElseThrow(RuntimeException::new);
+            column.setName(columnName);
+            columnRepo.save(column);
+        }
     }
 
 }

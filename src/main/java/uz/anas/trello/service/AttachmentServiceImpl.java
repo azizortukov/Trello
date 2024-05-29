@@ -20,17 +20,21 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public void removeById(UUID attachmentId) {
-        attachmentRepo.deleteById(attachmentId);
+        if (attachmentId != null) {
+            attachmentRepo.deleteById(attachmentId);
+        }
     }
 
     @SneakyThrows
     @Override
     public void saveAttachment(MultipartFile fileUpload, Task taskById) {
-        attachmentRepo.save(Attachment.builder()
-                .task(taskById)
-                .content(fileUpload.getBytes())
-                .fileName(fileUpload.getOriginalFilename())
-                .build());
+        if (fileUpload != null && !fileUpload.isEmpty()) {
+            attachmentRepo.save(Attachment.builder()
+                    .task(taskById)
+                    .content(fileUpload.getBytes())
+                    .fileName(fileUpload.getOriginalFilename())
+                    .build());
+        }
     }
 
     @Override

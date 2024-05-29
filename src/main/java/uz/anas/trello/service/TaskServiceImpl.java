@@ -6,6 +6,7 @@ import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.Task;
 import uz.anas.trello.repo.ColumnRepo;
 import uz.anas.trello.repo.TaskRepo;
+import uz.anas.trello.repo.UserRepo;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,6 +17,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepo taskRepo;
     private final ColumnRepo columnRepo;
+    private final UserRepo userRepo;
 
     @Override
     public Task save(Task task) {
@@ -50,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
         Task taskById = taskRepo.findById(UUID.fromString(split[0])).orElseThrow(RuntimeException::new);
         Column columnById = columnRepo.findById(UUID.fromString(split[1])).orElseThrow(RuntimeException::new);
         if (columnById.isFinishLine() || columnById.getColumnOrder() > getFinishColNum()) {
-            if (taskById.getDeadline().isBefore(LocalDateTime.now())) {
+            if (taskById.getDeadline() != null && taskById.getDeadline().isBefore(LocalDateTime.now())) {
                 taskById.setLateFinished(true);
             }
             taskById.setFinished(true);
@@ -74,6 +76,23 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepo.findById(id).orElseThrow(RuntimeException::new);
         task.setArchived(true);
         taskRepo.save(task);
+    }
+
+    @Override
+    public void updateTask(String taskName, UUID addUserId, UUID removeUserId, LocalDateTime taskDeadLine, Task taskById) {
+        if (taskName != null && !taskName.isEmpty()) {
+            taskById.setName(taskName);
+        }
+        if (addUserId != null) {
+            taskById.getMembers().add(userRepo.findById(addUserId).orElse(null));
+        }
+        if (removeUserId != null) {
+            taskById.getMembers().remove(userRepo.findById(removeUserId).orElse(null));
+        }
+        if (taskDeadLine != null) {
+            taskById.setDeadline(taskDeadLine);
+        }
+        taskRepo.save(taskById);
     }
 
 }

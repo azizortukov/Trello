@@ -1,5 +1,6 @@
 package uz.anas.trello.service;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import uz.anas.trello.entity.Column;
 import uz.anas.trello.entity.User;
@@ -30,4 +31,6 @@ public interface ColumnService {
     void buildAndSave(String columnName, Boolean finishLine);
 
     void archiveById(UUID columnId);
+
+    void updateColumn(String columnName, HttpSession httpSession);
 }

@@ -19,12 +19,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void addCommentByTaskId(Task taskById, String comment, User user) {
-        commentRepo.save(Comment.builder()
-                .task(taskById)
-                .text(comment)
-                .createdAt(LocalDateTime.now())
-                .user(user)
-                .build());
+        if (comment != null && !comment.isEmpty()) {
+            commentRepo.save(Comment.builder()
+                    .task(taskById)
+                    .text(comment)
+                    .createdAt(LocalDateTime.now())
+                    .user(user)
+                    .build());
+        }
     }
 
     @Override

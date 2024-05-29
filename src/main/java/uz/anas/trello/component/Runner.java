@@ -25,25 +25,25 @@ public class Runner implements CommandLineRunner {
         Faker faker = new Faker();
         if (userService.findAll().isEmpty()) {
             userService.save(User.builder()
-                    .email("jason")
+                    .username("jason")
                     .password(passwordEncoder.encode("123"))
                     .firstName("Jason")
                     .lastName("Rath")
                     .build());
             userService.save(User.builder()
-                    .email("benjamin")
+                    .username("benjamin")
                     .password(passwordEncoder.encode("123"))
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())
                     .build());
             userService.save(User.builder()
-                    .email("isabella")
+                    .username("isabella")
                     .password(passwordEncoder.encode("123"))
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())
                     .build());
             userService.save(User.builder()
-                    .email("david")
+                    .username("david")
                     .password(passwordEncoder.encode("123"))
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())

@@ -35,7 +35,7 @@
             <div class="d-flex">
                 <select class="form-select" id="selectUser" name="addUserId">
                     <option selected disabled>Select user</option>
-                    <option th:unless="${users == null}" th:each="user : ${users}" th:text="${user.email}"
+                    <option th:unless="${users == null}" th:each="user : ${users}" th:text="${user.username}"
                             th:value="${user.id}"></option>
                 </select>
                 <button type="submit" class="btn btn-outline-success ms-3"><i class="fa-solid fa-user-plus"></i>
@@ -44,7 +44,7 @@
             <ul class="list-group mt-2" id="userList">
                 <li th:unless="${task == null}" th:each="member : ${task.members}"
                     th:value="${member.id}" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span th:text="${member.email}"></span>
+                    <span th:text="${member.username}"></span>
                     <button type="submit" class="btn btn-danger btn-sm" name="removeUserId" th:value="${member.id}"><i
                             class="fa-solid fa-user-slash"></i></button>
                 </li>
