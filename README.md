@@ -24,6 +24,10 @@ This project is a web application similar to Trello, allowing administrators to 
 - SQL
 - Docker (for deployment)
 
+## Database Design link
+
+[Click here](https://lucid.app/lucidchart/3159fbd5-e020-4865-8155-9c98fede7dd2/edit?viewport_loc=-590%2C-510%2C2534%2C1424%2C0_0&invitationId=inv_dfdd24d6-7e8b-424c-92c6-ff9eee7eedc0)
+
 ## Usage
 
 1. Install Docker on your device.
